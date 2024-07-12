@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <link rel="stylesheet" href="login.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="login-container">
+        <form class="login-form" action="/login"  method="post" onsubmit="return validateForm()">
+            <h2>Login</h2>
+            <div class="input-group">
+                <input type="text" id="username" name="username" placeholder="Username" required>
+            </div>
+            <div class="input-group">
+                <input type="password"  id="password" name="password" placeholder="Password" required>
+                <i class="fas fa-eye"  id="togglePassword"></i>
+            </div>
+            <div class="remember-forgot">
+                <label>
+                    <input type="checkbox"> Remember me
+                </label>
+                <a href="javascript:void(0);" onclick="openModal()">Forgot password?</a>
+            </div>
+            <button type="submit" class="login-btn">Login</button>
+            <p class="signup-text">Don't have an account? <a href="signup.html">Sign up</a></p>
+        </form>
+    </div>
+
+
+     <div id="forgotPasswordModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>Forgot Password</h2>
+            <form id="resetForm">
+                <div class="input-group1"> <label for="forgotUsername">Username:</label>
+                    <input type="text" id="forgotUsername" name="forgotUsername" required>
+                </div>
+               <br>
+              <div class="input-group1">
+                <label for="newPassword">New Password:</label>
+                <input type="password" id="newPassword" name="newPassword" required></div><br>
+        
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function validateForm() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            if (!username || !password) {
+                alert('Both username and password are required');
+                return false;
+            }
+
+            return true;
+        }
+
+        document.getElementById('togglePassword').addEventListener('click', function () {
+            const passwordField = document.getElementById('password');
+            const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordField.setAttribute('type', type);
+            this.classList.toggle('fa-eye-slash');
+        });
+
+
+        function openModal() {
+            document.getElementById('forgotPasswordModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('forgotPasswordModal').style.display = 'none';
+        }
+
+        document.getElementById('resetForm').addEventListener('submit', async function (event) {
+            event.preventDefault();
+
+            const username = document.getElementById('forgotUsername').value;
+            const newPassword = document.getElementById('newPassword').value;
+
+            try {
+                const response = await fetch('/updatePassword', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, newPassword })
+                });
+
+                const data = await response.json();
+                alert(data.message); 
+                closeModal(); 
+            } catch (error) {
+                console.error('Error updating password:', error);
+                alert('Error updating password. Please try again.');
+            }
+        });
+    </script>
+</body>
+</html>
